@@ -31,13 +31,13 @@ public class MainActivity extends Activity implements LoaderCallbacks<Cursor>, O
 	private static final int[]			TO				= new int[] { R.id.tv_amt};
 	private static SimpleCursorAdapter	sca;
 	private static float				total			= 0.0f;
-	private static ListView				lv_list;
-	private static TextView				tv_total, tv_sign;
-	private static RelativeLayout		rl_main, rl_panel;
-	private static EditText				et_amt, et_label;
+	private ListView					lv_list;
+	private TextView					tv_total, tv_sign;
+	private RelativeLayout				rl_main, rl_panel;
+	private EditText					et_amt, et_label;
 	private static boolean				signed_for_add	= true;
-	private static ImageButton			btn_cancel, btn_delete, btn_enter, btn_update;
-	private static long					del_id			= -1;
+	private ImageButton					btn_cancel, btn_delete, btn_enter, btn_update;
+	private long						del_id			= -1;
 	protected static Typeface			segoe;
 	
 	private static enum PanelType {
@@ -145,6 +145,13 @@ public class MainActivity extends Activity implements LoaderCallbacks<Cursor>, O
 				break;
 			case R.id.btn_panel_delete:
 				if( del_id != -1) {
+					final Cursor c =
+							getContentResolver().query(
+									ContentUris.withAppendedId( BudgetProvider.CONTENT_URI, del_id),
+									BudgetProvider.PROJECTION_ALL, BudgetProvider._ID + "=?",
+									new String[] { "" + del_id}, null);
+					c.moveToFirst();
+					updateTotal( -c.getFloat( c.getColumnIndex( BudgetProvider.COL_AMT)));
 					final int r =
 							getContentResolver().delete(
 									ContentUris.withAppendedId( BudgetProvider.CONTENT_URI, del_id),
@@ -157,6 +164,19 @@ public class MainActivity extends Activity implements LoaderCallbacks<Cursor>, O
 				break;
 			case R.id.btn_panel_update:
 				Log.d( TAG, "onClick: update");
+				final ContentValues values = new ContentValues();
+				final Cursor c =
+						getContentResolver().query( ContentUris.withAppendedId( BudgetProvider.CONTENT_URI, del_id),
+								BudgetProvider.PROJECTION_ALL, BudgetProvider._ID + "=?", new String[] { "" + del_id},
+								null);
+				c.moveToFirst();
+				updateTotal( Float.parseFloat( et_amt.getText().toString())
+						- c.getFloat( c.getColumnIndex( BudgetProvider.COL_AMT)));
+				values.put( BudgetProvider.COL_AMT, et_amt.getText().toString());
+				values.put( BudgetProvider.COL_LABEL, et_label.getText().toString());
+				values.put( BudgetProvider.COL_DATE, System.currentTimeMillis());
+				getContentResolver().update( ContentUris.withAppendedId( BudgetProvider.CONTENT_URI, del_id), values,
+						BudgetProvider._ID + "=?", new String[] { "" + del_id});
 				showPanelButtons( PanelType.HIDE);
 				break;
 			default:

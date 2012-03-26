@@ -69,7 +69,6 @@
             android:contentDescription="@string/btn_edit_cd"
             android:onClick="onClick"
             android:padding="8dp"
-            android:scaleType="fitCenter"
             android:src="@drawable/accept" />
         <ImageButton
             android:id="@+id/btn_panel_cancel"
@@ -97,8 +96,8 @@
             android:adjustViewBounds="true"
             android:background="@android:color/transparent"
             android:contentDescription="@string/btn_delete_cd"
+            android:onClick="onClick"
             android:padding="8dp"
-            android:scaleType="fitCenter"
             android:src="@drawable/delete" />
         <TextView
             android:id="@+id/tv_panel_amtsign"
