@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <color name="color_green">#b2d663</color>
+    <color name="color_red">#f27970</color>
+    <color name="color_grey">#2d2d2d</color>
+    <color name="color_dropdown">#d1d3d4</color>
+    <!-- comment -->
+</resources>

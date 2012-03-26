@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">Budget7</string>
+    <string name="tv_total_hint">0.0</string>
+    <string name="et_panel_amt_hint">0.00</string>
+    <string name="et_panel_label_hint">Add a note.</string>
+    <!-- comment -->
+    <string name="amt_sign_hint">$+/-</string>
+    <string name="toast_need_amt">Please enter an amount first.</string>
+    <string name="btn_edit_cd">EDIT</string>
+    <string name="btn_delete_cd">DELETE</string>
+    <string name="btn_cancel_cd">CANCEL</string>
+    <string name="btn_add_cd">ADD</string>
+    <string name="btn_sub_cd">SUB</string>
+</resources>
