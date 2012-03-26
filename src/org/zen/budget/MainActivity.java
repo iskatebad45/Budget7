@@ -44,6 +44,7 @@ public class MainActivity extends Activity implements LoaderCallbacks<Cursor>, O
 		NEW, UPDATE, HIDE;
 	}
 	//test update from eclipse
+	//test update from eclipse
 
 	@Override
 	public void onCreate( Bundle savedInstanceState) {
