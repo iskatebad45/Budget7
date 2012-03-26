@@ -43,9 +43,7 @@ public class MainActivity extends Activity implements LoaderCallbacks<Cursor>, O
 	private static enum PanelType {
 		NEW, UPDATE, HIDE;
 	}
-	//test update from eclipse
-	//test update from eclipse
-
+	
 	@Override
 	public void onCreate( Bundle savedInstanceState) {
 		super.onCreate( savedInstanceState);
