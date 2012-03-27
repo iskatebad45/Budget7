@@ -7,9 +7,9 @@
     <!-- comment -->
     <string name="amt_sign_hint">$+/-</string>
     <string name="toast_need_amt">Please enter an amount first.</string>
-    <string name="btn_edit_cd">EDIT</string>
-    <string name="btn_delete_cd">DELETE</string>
-    <string name="btn_cancel_cd">CANCEL</string>
+    <string name="btn_check_cd">CHECK</string>
+    <string name="btn_ex_cd">DELETE</string>
     <string name="btn_add_cd">ADD</string>
     <string name="btn_sub_cd">SUB</string>
+    <string name="btn_menu_cd">MENU</string>
 </resources>

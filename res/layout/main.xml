@@ -3,18 +3,11 @@
     android:id="@+id/rl_main"
     android:layout_width="match_parent"
     android:layout_height="match_parent" >
-    <fragment
-        android:id="@+id/rl_panel"
-        android:name="org.zen.budget.NewPanelActivity"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content" >
-        <!-- Preview: layout=@layout/new_panel_frag -->
-    </fragment>
     <TextView
         android:id="@+id/tv_total"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_below="@id/rl_panel"
+        android:layout_alignParentTop="true"
         android:layout_centerHorizontal="true"
         android:focusable="false"
         android:hint="@string/tv_total_hint"
@@ -88,7 +81,7 @@
         android:paddingBottom="7.5dp"
         android:paddingTop="1dp"
         android:scaleType="fitCenter"
-        android:src="@drawable/menu" />
+        android:src="@drawable/three_dots" />
     <ImageButton
         android:id="@+id/fill"
         android:layout_width="50dp"
@@ -97,6 +90,7 @@
         android:layout_below="@android:id/list"
         android:background="@color/color_grey"
         android:clickable="false"
+        android:contentDescription="@string/btn_menu_cd"
         android:padding="1dp"
         android:scaleType="fitCenter" />
 </RelativeLayout>

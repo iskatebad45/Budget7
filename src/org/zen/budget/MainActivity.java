@@ -1,12 +1,11 @@
 package org.zen.budget;
 
 import android.app.Activity;
-import android.app.Fragment;
-import android.app.FragmentTransaction;
 import android.app.LoaderManager.LoaderCallbacks;
 import android.content.ContentUris;
 import android.content.ContentValues;
 import android.content.CursorLoader;
+import android.content.Intent;
 import android.content.Loader;
 import android.database.Cursor;
 import android.graphics.Typeface;
@@ -14,11 +13,8 @@ import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
 import android.view.View.OnClickListener;
-import android.view.inputmethod.InputMethodManager;
 import android.widget.AdapterView;
 import android.widget.AdapterView.OnItemClickListener;
-import android.widget.EditText;
-import android.widget.ImageButton;
 import android.widget.ListView;
 import android.widget.RelativeLayout;
 import android.widget.SimpleCursorAdapter;
@@ -27,53 +23,36 @@ import android.widget.TextView;
 
 public class MainActivity extends Activity implements LoaderCallbacks<Cursor>, OnClickListener, OnItemClickListener {
 	
-	private static final String			TAG				= ".MainActivity";
-	private static final String[]		PROJECTION		= new String[] { BudgetProvider._ID, BudgetProvider.COL_AMT},
+	private static final String			TAG			= ".MainActivity";
+	private static final String[]		PROJECTION	= new String[] { BudgetProvider._ID, BudgetProvider.COL_AMT},
 			FROM = new String[] { BudgetProvider.COL_AMT};
-	private static final int[]			TO				= new int[] { R.id.tv_amt};
+	private static final int[]			TO			= new int[] { R.id.tv_amt};
 	private static SimpleCursorAdapter	sca;
-	private static float				total			= 0.0f;
+	private static float				total		= 0.0f;
 	private ListView					lv_list;
-	private TextView					tv_total, tv_sign;
-	private RelativeLayout				rl_main, rl_panel;
-	private EditText					et_amt, et_label;
-	private static boolean				signed_for_add	= true;
-	// private ImageButton btn_cancel, btn_delete, btn_enter, btn_update;
-	private long						del_id			= -1;
-	protected static Typeface			segoe;
+	private TextView					tv_total;
+	private RelativeLayout				rl_main;
 	
-	private static enum PanelType {
-		NEW, UPDATE, HIDE;
-	}
+	// private ImageButton btn_cancel, btn_delete, btn_enter, btn_update;
 	
 	@Override
 	public void onCreate( Bundle savedInstanceState) {
 		super.onCreate( savedInstanceState);
 		setContentView( R.layout.main);
-		segoe = Typeface.createFromAsset( getAssets(), "fonts/segoe.ttf");
 		tv_total = (TextView)findViewById( R.id.tv_total);
-		tv_sign = (TextView)findViewById( R.id.tv_panel_amtsign);
 		rl_main = (RelativeLayout)findViewById( R.id.rl_main);
-		rl_panel = (RelativeLayout)findViewById( R.id.rl_panel);
-		et_amt = (EditText)findViewById( R.id.et_panel_amt);
-		et_label = (EditText)findViewById( R.id.et_panel_label);
 		// btn_cancel = (ImageButton)findViewById( R.id.btn_panel_cancel);
 		// btn_delete = (ImageButton)findViewById( R.id.btn_panel_delete);
 		// btn_enter = (ImageButton)findViewById( R.id.btn_panel_enter);
 		// btn_update = (ImageButton)findViewById( R.id.btn_panel_update);
-		tv_total.setTypeface( segoe);
-		tv_sign.setTypeface( segoe);
-		et_amt.setTypeface( segoe);
-		et_label.setTypeface( segoe);
 		sca = new SimpleCursorAdapter( this, R.layout.item, null, FROM, TO, 0);
 		lv_list = (ListView)findViewById( android.R.id.list);
 		lv_list.setAdapter( sca);
 		lv_list.setOnItemClickListener( this);
-		// showPanelButtons( PanelType.HIDE);
 		sca.setViewBinder( new ViewBinder() {
 			public boolean setViewValue( View view, Cursor cursor, int columnIndex) {
 				((TextView)view).setText( String.format( "%,+.2f", cursor.getFloat( columnIndex)));
-				((TextView)view).setTypeface( segoe);
+				((TextView)view).setTypeface( Typeface.createFromAsset( getAssets(), "fonts/segoe.ttf"));
 				return true;
 			}
 		});
@@ -103,7 +82,6 @@ public class MainActivity extends Activity implements LoaderCallbacks<Cursor>, O
 	protected final void onResume() {
 		super.onResume();
 		sca.notifyDataSetChanged();
-		rl_panel.setVisibility( View.GONE);
 		Log.d( TAG, "onResume");
 	}
 	
@@ -116,15 +94,35 @@ public class MainActivity extends Activity implements LoaderCallbacks<Cursor>, O
 	
 	public void onClick( View v) {
 		Log.d( TAG, "onClick");
+		final Intent intent = new Intent( this, NewPanelActivity.class);
 		switch( v.getId()) {
 			case R.id.btn_add:
+				intent.putExtra( PanelActivity.INTENT_EXTRA_IS_ADD, true);
+				startActivityForResult( intent, Budget7.REQ_ADD);
 				Log.d( TAG, "onClick: add");
 				break;
 			case R.id.btn_sub:
+				intent.putExtra( PanelActivity.INTENT_EXTRA_IS_ADD, true);
+				startActivityForResult( intent, Budget7.REQ_ADD);
 				Log.d( TAG, "onClick: sub");
 				break;
 			default:
 				Log.d( TAG, "onClick: found something else...");
+				break;
+		}
+	}
+	
+	@Override
+	protected void onActivityResult( int requestCode, int resultCode, Intent data) {
+		switch( requestCode) {
+			case Budget7.REQ_ADD:
+				Log.d( TAG, "onActivityResult: add");
+				break;
+			case Budget7.REQ_SUB:
+				Log.d( TAG, "onActivityResult: add");
+				break;
+			default:
+				break;
 		}
 	}
 	
@@ -166,11 +164,6 @@ public class MainActivity extends Activity implements LoaderCallbacks<Cursor>, O
 						BudgetProvider.PROJECTION_ALL, BudgetProvider._ID + "=?", new String[] { "" + id}, null);
 		c.moveToFirst();
 		// showPanelButtons( PanelType.UPDATE);
-		final float amt = c.getFloat( c.getColumnIndex( BudgetProvider.COL_AMT));
-		tv_sign.setText( amt >= 0.0f ? "$+" : "$-");
-		et_amt.setText( String.format( "%,.2f", Math.abs( amt)));
-		et_label.setText( c.getString( c.getColumnIndex( BudgetProvider.COL_LABEL)));
-		del_id = id;
 	}
 	
 	private void insert( final float amt) {

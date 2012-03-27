@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <style name="panel_top_wSlideDown" parent="@android:style/Theme.Translucent.NoTitleBar.Fullscreen">
+        <item name="android:layoutAnimation">@anim/push_down_in</item>
+        <item name="android:windowIsFloating">false</item>
+        <item name="android:windowBackground">@android:color/transparent</item>
+        <item name="android:activityCloseExitAnimation">@anim/push_down_in</item>
+    </style>
+</resources>
