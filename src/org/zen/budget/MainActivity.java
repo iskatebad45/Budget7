@@ -1,6 +1,8 @@
 package org.zen.budget;
 
 import android.app.Activity;
+import android.app.Fragment;
+import android.app.FragmentTransaction;
 import android.app.LoaderManager.LoaderCallbacks;
 import android.content.ContentUris;
 import android.content.ContentValues;
@@ -22,9 +24,9 @@ import android.widget.RelativeLayout;
 import android.widget.SimpleCursorAdapter;
 import android.widget.SimpleCursorAdapter.ViewBinder;
 import android.widget.TextView;
-import android.widget.Toast;
 
 public class MainActivity extends Activity implements LoaderCallbacks<Cursor>, OnClickListener, OnItemClickListener {
+	
 	private static final String			TAG				= ".MainActivity";
 	private static final String[]		PROJECTION		= new String[] { BudgetProvider._ID, BudgetProvider.COL_AMT},
 			FROM = new String[] { BudgetProvider.COL_AMT};
@@ -36,7 +38,7 @@ public class MainActivity extends Activity implements LoaderCallbacks<Cursor>, O
 	private RelativeLayout				rl_main, rl_panel;
 	private EditText					et_amt, et_label;
 	private static boolean				signed_for_add	= true;
-	private ImageButton					btn_cancel, btn_delete, btn_enter, btn_update;
+	// private ImageButton btn_cancel, btn_delete, btn_enter, btn_update;
 	private long						del_id			= -1;
 	protected static Typeface			segoe;
 	
@@ -55,10 +57,10 @@ public class MainActivity extends Activity implements LoaderCallbacks<Cursor>, O
 		rl_panel = (RelativeLayout)findViewById( R.id.rl_panel);
 		et_amt = (EditText)findViewById( R.id.et_panel_amt);
 		et_label = (EditText)findViewById( R.id.et_panel_label);
-		btn_cancel = (ImageButton)findViewById( R.id.btn_panel_cancel);
-		btn_delete = (ImageButton)findViewById( R.id.btn_panel_delete);
-		btn_enter = (ImageButton)findViewById( R.id.btn_panel_enter);
-		btn_update = (ImageButton)findViewById( R.id.btn_panel_update);
+		// btn_cancel = (ImageButton)findViewById( R.id.btn_panel_cancel);
+		// btn_delete = (ImageButton)findViewById( R.id.btn_panel_delete);
+		// btn_enter = (ImageButton)findViewById( R.id.btn_panel_enter);
+		// btn_update = (ImageButton)findViewById( R.id.btn_panel_update);
 		tv_total.setTypeface( segoe);
 		tv_sign.setTypeface( segoe);
 		et_amt.setTypeface( segoe);
@@ -67,7 +69,7 @@ public class MainActivity extends Activity implements LoaderCallbacks<Cursor>, O
 		lv_list = (ListView)findViewById( android.R.id.list);
 		lv_list.setAdapter( sca);
 		lv_list.setOnItemClickListener( this);
-		showPanelButtons( PanelType.HIDE);
+		// showPanelButtons( PanelType.HIDE);
 		sca.setViewBinder( new ViewBinder() {
 			public boolean setViewValue( View view, Cursor cursor, int columnIndex) {
 				((TextView)view).setText( String.format( "%,+.2f", cursor.getFloat( columnIndex)));
@@ -117,111 +119,53 @@ public class MainActivity extends Activity implements LoaderCallbacks<Cursor>, O
 		switch( v.getId()) {
 			case R.id.btn_add:
 				Log.d( TAG, "onClick: add");
-				tv_sign.setText( "$+");
-				signed_for_add = true;
-				showPanelButtons( PanelType.NEW);
 				break;
 			case R.id.btn_sub:
 				Log.d( TAG, "onClick: sub");
-				rl_panel.setVisibility( View.VISIBLE);
-				btn_delete.setVisibility( View.GONE);
-				btn_cancel.setVisibility( View.VISIBLE);
-				showPanelButtons( PanelType.NEW);
-				tv_sign.setText( "$-");
-				signed_for_add = false;
-				break;
-			case R.id.btn_panel_enter:
-				Log.d( TAG, "onClick: enter");
-				final String amt = et_amt.getText().toString();
-				if( !amt.isEmpty()) {
-					insert( signed_for_add ? 1.0f * Float.parseFloat( amt) : -1.0f * Float.parseFloat( amt));
-				} else {
-					Toast.makeText( this, R.string.toast_need_amt, Toast.LENGTH_LONG).show();
-				}
-				showPanelButtons( PanelType.HIDE);
-			case R.id.btn_panel_cancel:
-				Log.d( TAG, "onClick: cancel");
-				showPanelButtons( PanelType.HIDE);
-				break;
-			case R.id.btn_panel_delete:
-				if( del_id != -1) {
-					final Cursor c =
-							getContentResolver().query(
-									ContentUris.withAppendedId( BudgetProvider.CONTENT_URI, del_id),
-									BudgetProvider.PROJECTION_ALL, BudgetProvider._ID + "=?",
-									new String[] { "" + del_id}, null);
-					c.moveToFirst();
-					updateTotal( -c.getFloat( c.getColumnIndex( BudgetProvider.COL_AMT)));
-					final int r =
-							getContentResolver().delete(
-									ContentUris.withAppendedId( BudgetProvider.CONTENT_URI, del_id),
-									BudgetProvider._ID + "=?", new String[] { "" + del_id});
-					Log.d( TAG, "onClick: delete: " + r);
-				}
-				sca.notifyDataSetChanged();
-				del_id = -1;
-				showPanelButtons( PanelType.HIDE);
-				break;
-			case R.id.btn_panel_update:
-				Log.d( TAG, "onClick: update");
-				final ContentValues values = new ContentValues();
-				final Cursor c =
-						getContentResolver().query( ContentUris.withAppendedId( BudgetProvider.CONTENT_URI, del_id),
-								BudgetProvider.PROJECTION_ALL, BudgetProvider._ID + "=?", new String[] { "" + del_id},
-								null);
-				c.moveToFirst();
-				updateTotal( Float.parseFloat( et_amt.getText().toString())
-						- c.getFloat( c.getColumnIndex( BudgetProvider.COL_AMT)));
-				values.put( BudgetProvider.COL_AMT, et_amt.getText().toString());
-				values.put( BudgetProvider.COL_LABEL, et_label.getText().toString());
-				values.put( BudgetProvider.COL_DATE, System.currentTimeMillis());
-				getContentResolver().update( ContentUris.withAppendedId( BudgetProvider.CONTENT_URI, del_id), values,
-						BudgetProvider._ID + "=?", new String[] { "" + del_id});
-				showPanelButtons( PanelType.HIDE);
 				break;
 			default:
 				Log.d( TAG, "onClick: found something else...");
 		}
 	}
 	
-	private void showPanelButtons( PanelType type) {
-		et_label.setText( "");
-		et_amt.setText( "");
-		switch( type) {
-			case NEW:
-				rl_panel.setVisibility( View.VISIBLE);
-				btn_cancel.setVisibility( View.VISIBLE);
-				btn_delete.setVisibility( View.GONE);
-				btn_enter.setVisibility( View.VISIBLE);
-				btn_update.setVisibility( View.GONE);
-				break;
-			case UPDATE:
-				rl_panel.setVisibility( View.VISIBLE);
-				btn_cancel.setVisibility( View.GONE);
-				btn_delete.setVisibility( View.VISIBLE);
-				btn_enter.setVisibility( View.GONE);
-				btn_update.setVisibility( View.VISIBLE);
-				break;
-			case HIDE:
-				if( ((InputMethodManager)getSystemService( INPUT_METHOD_SERVICE)).isAcceptingText()) {
-					((InputMethodManager)getSystemService( INPUT_METHOD_SERVICE)).hideSoftInputFromWindow(
-							et_amt.getWindowToken(), 0);
-				}
-				rl_panel.setVisibility( View.GONE);
-				btn_cancel.setVisibility( View.GONE);
-				btn_delete.setVisibility( View.GONE);
-				btn_enter.setVisibility( View.GONE);
-				btn_update.setVisibility( View.GONE);
-				break;
-		}
-	}
+	// private void showPanelButtons( PanelType type) {
+	// et_label.setText( "");
+	// et_amt.setText( "");
+	// switch( type) {
+	// case NEW:
+	// rl_panel.setVisibility( View.VISIBLE);
+	// btn_cancel.setVisibility( View.VISIBLE);
+	// btn_delete.setVisibility( View.GONE);
+	// btn_enter.setVisibility( View.VISIBLE);
+	// btn_update.setVisibility( View.GONE);
+	// break;
+	// case UPDATE:
+	// rl_panel.setVisibility( View.VISIBLE);
+	// btn_cancel.setVisibility( View.GONE);
+	// btn_delete.setVisibility( View.VISIBLE);
+	// btn_enter.setVisibility( View.GONE);
+	// btn_update.setVisibility( View.VISIBLE);
+	// break;
+	// case HIDE:
+	// if( ((InputMethodManager)getSystemService( INPUT_METHOD_SERVICE)).isAcceptingText()) {
+	// ((InputMethodManager)getSystemService( INPUT_METHOD_SERVICE)).hideSoftInputFromWindow(
+	// et_amt.getWindowToken(), 0);
+	// }
+	// rl_panel.setVisibility( View.GONE);
+	// btn_cancel.setVisibility( View.GONE);
+	// btn_delete.setVisibility( View.GONE);
+	// btn_enter.setVisibility( View.GONE);
+	// btn_update.setVisibility( View.GONE);
+	// break;
+	// }
+	// }
 	
 	public void onItemClick( AdapterView<?> parent, View v, int pos, long id) {
 		final Cursor c =
 				getContentResolver().query( ContentUris.withAppendedId( BudgetProvider.CONTENT_URI, id),
 						BudgetProvider.PROJECTION_ALL, BudgetProvider._ID + "=?", new String[] { "" + id}, null);
 		c.moveToFirst();
-		showPanelButtons( PanelType.UPDATE);
+		// showPanelButtons( PanelType.UPDATE);
 		final float amt = c.getFloat( c.getColumnIndex( BudgetProvider.COL_AMT));
 		tv_sign.setText( amt >= 0.0f ? "$+" : "$-");
 		et_amt.setText( String.format( "%,.2f", Math.abs( amt)));
@@ -266,3 +210,55 @@ public class MainActivity extends Activity implements LoaderCallbacks<Cursor>, O
 		sca.swapCursor( null);
 	}
 }
+
+/*
+ * case R.id.btn_panel_enter:
+ * Log.d( TAG, "onClick: enter");
+ * final String amt = et_amt.getText().toString();
+ * if( !amt.isEmpty()) {
+ * insert( signed_for_add ? 1.0f * Float.parseFloat( amt) : -1.0f * Float.parseFloat( amt));
+ * } else {
+ * Toast.makeText( this, R.string.toast_need_amt, Toast.LENGTH_LONG).show();
+ * }
+ * showPanelButtons( PanelType.HIDE);
+ * case R.id.btn_panel_cancel:
+ * Log.d( TAG, "onClick: cancel");
+ * showPanelButtons( PanelType.HIDE);
+ * break;
+ * case R.id.btn_panel_delete:
+ * if( del_id != -1) {
+ * final Cursor c =
+ * getContentResolver().query(
+ * ContentUris.withAppendedId( BudgetProvider.CONTENT_URI, del_id),
+ * BudgetProvider.PROJECTION_ALL, BudgetProvider._ID + "=?",
+ * new String[] { "" + del_id}, null);
+ * c.moveToFirst();
+ * updateTotal( -c.getFloat( c.getColumnIndex( BudgetProvider.COL_AMT)));
+ * final int r =
+ * getContentResolver().delete(
+ * ContentUris.withAppendedId( BudgetProvider.CONTENT_URI, del_id),
+ * BudgetProvider._ID + "=?", new String[] { "" + del_id});
+ * Log.d( TAG, "onClick: delete: " + r);
+ * }
+ * sca.notifyDataSetChanged();
+ * del_id = -1;
+ * showPanelButtons( PanelType.HIDE);
+ * break;
+ * case R.id.btn_panel_update:
+ * Log.d( TAG, "onClick: update");
+ * final ContentValues values = new ContentValues();
+ * final Cursor c =
+ * getContentResolver().query( ContentUris.withAppendedId( BudgetProvider.CONTENT_URI, del_id),
+ * BudgetProvider.PROJECTION_ALL, BudgetProvider._ID + "=?", new String[] { "" + del_id},
+ * null);
+ * c.moveToFirst();
+ * updateTotal( Float.parseFloat( et_amt.getText().toString())
+ * - c.getFloat( c.getColumnIndex( BudgetProvider.COL_AMT)));
+ * values.put( BudgetProvider.COL_AMT, et_amt.getText().toString());
+ * values.put( BudgetProvider.COL_LABEL, et_label.getText().toString());
+ * values.put( BudgetProvider.COL_DATE, System.currentTimeMillis());
+ * getContentResolver().update( ContentUris.withAppendedId( BudgetProvider.CONTENT_URI, del_id), values,
+ * BudgetProvider._ID + "=?", new String[] { "" + del_id});
+ * showPanelButtons( PanelType.HIDE);
+ * break;
+ */

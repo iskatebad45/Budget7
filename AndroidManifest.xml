@@ -10,7 +10,9 @@
         android:theme="@android:style/Theme.Black.NoTitleBar.Fullscreen" >
         <activity
             android:name=".MainActivity"
-            android:label="@string/app_name" android:launchMode="singleTop" android:windowSoftInputMode="adjustPan">
+            android:label="@string/app_name"
+            android:launchMode="singleTask"
+            android:windowSoftInputMode="adjustPan" >
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
                 <category android:name="android.intent.category.LAUNCHER" />
@@ -20,5 +22,21 @@
             android:name=".BudgetProvider"
             android:authorities="org.zen.budget.provider" >
         </provider>
+        <activity
+            android:name=".NewPanelActivity"
+            android:allowTaskReparenting="false"
+            android:excludeFromRecents="true"
+            android:exported="false" >
+            <intent-filter>
+            </intent-filter>
+        </activity>
+        <activity
+            android:name=".UpdatePanelActivity"
+            android:allowTaskReparenting="false"
+            android:excludeFromRecents="true"
+            android:exported="false" >
+            <intent-filter>
+            </intent-filter>
+        </activity>
     </application>
 </manifest>
