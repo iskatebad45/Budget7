@@ -22,7 +22,7 @@ public class BudgetProvider extends ContentProvider implements BaseColumns {
 	private static final int				DB_VERSION		= 1, CODE_TABLE = 1, CODE_ITEM = 2;
 	private static final UriMatcher			matcher;
 	private static HashMap<String, String>	projectionMap;
-	private static BudgetDbHelper			helper;
+	private BudgetDbHelper					helper;
 	
 	public static final String				AUTHORITY		= Budget7.PKG + ".provider", COL_AMT = "amt",
 			COL_LABEL = "label", COL_DATE = "date",
@@ -42,6 +42,12 @@ public class BudgetProvider extends ContentProvider implements BaseColumns {
 		projectionMap.put( COL_DATE, COL_DATE);
 	}
 	
+	/**
+	 * Database helper for Budget7
+	 * 
+	 * @author rdhodapp
+	 * @see android.database.sqlite.SQLiteOpenHelper
+	 */
 	private static class BudgetDbHelper extends SQLiteOpenHelper {
 		private static final String	TAG				= ".BudgetDbHelper";
 		
@@ -50,11 +56,25 @@ public class BudgetProvider extends ContentProvider implements BaseColumns {
 															+ " INTEGER NOT NULL, " + COL_LABEL
 															+ " TEXT DEFAULT \"\", " + COL_DATE + " INTEGER NOT NULL);";
 		
+		/**
+		 * Uses static database name ({@value #DB_NAME}) and version ({@value #DB_VERSION})
+		 * 
+		 * @param context
+		 *            The context of the database helper
+		 * @see android.database.sqlite.SQLiteDatabase#SQLiteDatabase(Context, String, CursorFactory, int)
+		 */
 		public BudgetDbHelper( final Context context) {
 			super( context, DB_NAME, null, DB_VERSION);
 			Log.d( TAG, "BudgetDbHelper()");
 		}
 		
+		/**
+		 * onCreate
+		 * 
+		 * @param db
+		 *            The database to use
+		 * @see android.database.sqlite.SQLiteDatabase#onCreate(SQLiteDatabase)
+		 */
 		@Override
 		public void onCreate( final SQLiteDatabase db) {
 			Log.d( TAG, "onCreate");
