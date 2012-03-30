@@ -28,7 +28,7 @@ public class MainActivity extends Activity implements LoaderCallbacks<Cursor>, O
 	private static final String			O_SI_TOTAL	= "oSI_total";
 	private final String				TAG			= ".MainActivity";
 	private static SimpleCursorAdapter	sca;
-	private float						total		= 0.0f;
+	private float						total;
 	
 	/**
 	 * onCreate
@@ -41,9 +41,6 @@ public class MainActivity extends Activity implements LoaderCallbacks<Cursor>, O
 	public void onCreate( Bundle savedInstanceState) {
 		super.onCreate( savedInstanceState);
 		setContentView( R.layout.main);
-		if( savedInstanceState.isEmpty() || savedInstanceState == null) {
-			updateTotal( savedInstanceState.getFloat( O_SI_TOTAL));
-		}
 		sca =
 				new SimpleCursorAdapter( this, R.layout.item, null, new String[] { BudgetProvider.COL_AMT},
 						new int[] { R.id.tv_amt}, 0);
@@ -58,7 +55,7 @@ public class MainActivity extends Activity implements LoaderCallbacks<Cursor>, O
 			}
 		});
 		getLoaderManager().initLoader( 0, null, this);
-		Log.d( TAG, "onCreate");
+		Log.d( TAG, "onCreate: " + total);
 	}
 	
 	/**
@@ -69,20 +66,7 @@ public class MainActivity extends Activity implements LoaderCallbacks<Cursor>, O
 	@Override
 	protected final void onStart() {
 		super.onStart();
-		new Runnable() {
-			public void run() {
-				final Cursor c =
-						getContentResolver().query( BudgetProvider.CONTENT_URI, new String[] { BudgetProvider.COL_AMT},
-								null, null, null);
-				final short i_a = (short)c.getColumnIndex( BudgetProvider.COL_AMT);
-				float u = 0.0f;
-				while( c.moveToNext()) {
-					u += c.getFloat( i_a);
-				}
-				updateTotal( u);
-			}
-		}.run();
-		Log.d( TAG, "onStart");
+		Log.d( TAG, "onStart: " + total);
 	}
 	
 	/**
@@ -92,7 +76,8 @@ public class MainActivity extends Activity implements LoaderCallbacks<Cursor>, O
 	 */
 	protected final void onResume() {
 		super.onResume();
-		Log.d( TAG, "onResume");
+		updateTotal( 0.0f);
+		Log.d( TAG, "onResume: " + total);
 	}
 	
 	/**
@@ -110,7 +95,7 @@ public class MainActivity extends Activity implements LoaderCallbacks<Cursor>, O
 				updateTotal( savedInstanceState.getFloat( O_SI_TOTAL));
 			}
 		}
-		Log.d( TAG, "onRestoreInstanceState");
+		Log.d( TAG, "onRestoreInstanceState: " + total);
 	}
 	
 	/**
@@ -124,7 +109,7 @@ public class MainActivity extends Activity implements LoaderCallbacks<Cursor>, O
 	protected void onSaveInstanceState( Bundle outState) {
 		super.onSaveInstanceState( outState);
 		outState.putFloat( O_SI_TOTAL, total);
-		Log.d( TAG, "onSaveInstanceState");
+		Log.d( TAG, "onSaveInstanceState: " + total);
 	}
 	
 	/**
@@ -135,7 +120,7 @@ public class MainActivity extends Activity implements LoaderCallbacks<Cursor>, O
 	@Override
 	protected final void onPause() {
 		super.onPause();
-		Log.d( TAG, "onPause");
+		Log.d( TAG, "onPause: " + total);
 	}
 	
 	/**
@@ -145,8 +130,8 @@ public class MainActivity extends Activity implements LoaderCallbacks<Cursor>, O
 	 */
 	@Override
 	protected final void onStop() {
-		super.onPause();
-		Log.d( TAG, "onStop");
+		super.onStop();
+		Log.d( TAG, "onStop: " + total);
 	}
 	
 	/**
@@ -156,8 +141,8 @@ public class MainActivity extends Activity implements LoaderCallbacks<Cursor>, O
 	 */
 	@Override
 	protected final void onDestroy() {
-		super.onPause();
-		Log.d( TAG, "onDestroy");
+		super.onDestroy();
+		Log.d( TAG, "onDestroy: " + total);
 	}
 	
 	/**

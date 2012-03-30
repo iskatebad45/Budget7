@@ -25,7 +25,7 @@ public class BudgetProvider extends ContentProvider implements BaseColumns {
 	private BudgetDbHelper					helper;
 	
 	public static final String				AUTHORITY		= Budget7.PKG + ".provider", COL_AMT = "amt",
-			COL_LABEL = "label", COL_DATE = "date",
+			COL_LABEL = "label", COL_DATE = "date", VIEW_NAME = "total",
 			CONTENT_TYPE_TABLE = "vnd.android.cursor.dir/vnd.zen.budget7_items",
 			CONTENT_TYPE_ROW = "vnd.android.cursor.item/vnd.zen.budget7_item";
 	public static final Uri					CONTENT_URI		= Uri.parse( "content://" + AUTHORITY + "/" + TABLE_NAME);
@@ -49,6 +49,10 @@ public class BudgetProvider extends ContentProvider implements BaseColumns {
 	 * @see android.database.sqlite.SQLiteOpenHelper
 	 */
 	private static class BudgetDbHelper extends SQLiteOpenHelper {
+		
+		private static final String	CREATE_VIEW		= "CREATE VIEW IF NOT EXISTS " + VIEW_NAME + "AS SELECT sum("
+															+ COL_AMT + ") from items;";
+		
 		private static final String	TAG				= ".BudgetDbHelper";
 		
 		private static final String	CREATE_TABLE	= "CREATE TABLE " + TABLE_NAME + " (" + _ID
@@ -79,6 +83,7 @@ public class BudgetProvider extends ContentProvider implements BaseColumns {
 		public void onCreate( final SQLiteDatabase db) {
 			Log.d( TAG, "onCreate");
 			db.execSQL( CREATE_TABLE);
+			db.execSQL( CREATE_VIEW);
 		}
 		
 		@Override
@@ -172,6 +177,17 @@ public class BudgetProvider extends ContentProvider implements BaseColumns {
 		Log.d( TAG, "query: uri: " + uri);
 		c.setNotificationUri( getContext().getContentResolver(), uri);
 		return c;
+	}
+	
+	/**
+	 * 
+	 * @return
+	 */
+	public float getTotal() {
+		final Cursor c =
+				helper.getReadableDatabase().query( VIEW_NAME, new String[] { "ALL"}, null, null, null, null, null);
+		c.moveToFirst();
+		return c.getFloat( 1);
 	}
 	
 	@Override

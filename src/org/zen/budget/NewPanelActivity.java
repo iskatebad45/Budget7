@@ -7,9 +7,10 @@ import android.widget.Toast;
 public class NewPanelActivity extends PanelActivity {
 	private static final String	TAG	= ".NewPanelActivity";
 	
-	/*
+	/**
 	 * Final because you should extend PanelActivity instead
-	 * (non-Javadoc)
+	 * 
+	 * @return the amount to update the total by.
 	 * @see org.zen.budget.PanelActivity#checkAction()
 	 */
 	public final float checkAction() {
@@ -26,14 +27,16 @@ public class NewPanelActivity extends PanelActivity {
 			getContentResolver().insert( BudgetProvider.CONTENT_URI, values);
 		} else {
 			Toast.makeText( this, R.string.toast_need_amt, Toast.LENGTH_LONG).show();
+			return 0.0f;
 		}
 		// Log.d( TAG, "checkAction" + is_add);
 		return Float.parseFloat( str_amt);
 	}
 	
-	/*
+	/**
 	 * Final because you should extend PanelActivity instead
-	 * (non-Javadoc)
+	 * 
+	 * @return The amount to update the total by.
 	 * @see org.zen.budget.PanelActivity#exAction()
 	 */
 	public final float exAction() {
