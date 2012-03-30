@@ -22,11 +22,7 @@ import android.widget.TextView;
 
 public class MainActivity extends Activity implements LoaderCallbacks<Cursor>, OnClickListener, OnItemClickListener {
 	
-	/**
-	 * O_SI refers to onSaveInstanceState, tags for those bundles
-	 */
-	private static final String			O_SI_TOTAL	= "oSI_total";
-	private final String				TAG			= ".MainActivity";
+	private final String				TAG	= ".MainActivity";
 	private static SimpleCursorAdapter	sca;
 	private float						total;
 	
@@ -41,9 +37,14 @@ public class MainActivity extends Activity implements LoaderCallbacks<Cursor>, O
 	public void onCreate( Bundle savedInstanceState) {
 		super.onCreate( savedInstanceState);
 		setContentView( R.layout.main);
+		Log.d( TAG, "in sca");
+		// final Cursor c =
+		// getContentResolver()
+		// .query( BudgetProvider.CONTENT_URI, BudgetProvider.PROJECTION_ALL, null, null, null);
 		sca =
 				new SimpleCursorAdapter( this, R.layout.item, null, new String[] { BudgetProvider.COL_AMT},
 						new int[] { R.id.tv_amt}, 0);
+		Log.d( TAG, "out sca");
 		ListView lv_list = (ListView)findViewById( android.R.id.list);
 		lv_list.setAdapter( sca);
 		lv_list.setOnItemClickListener( this);
@@ -76,40 +77,10 @@ public class MainActivity extends Activity implements LoaderCallbacks<Cursor>, O
 	 */
 	protected final void onResume() {
 		super.onResume();
-		updateTotal( 0.0f);
+		final Cursor c = getContentResolver().query( BudgetProvider.TOTAL_URI, null, null, null, null);
+		c.moveToFirst();
+		updateTotal( c.getFloat( 1));
 		Log.d( TAG, "onResume: " + total);
-	}
-	
-	/**
-	 * onRestoreInstanceState
-	 * 
-	 * @param savedInstanceState
-	 *            The bundle of info saved
-	 * @see android.app.Activity#onRestoreInstanceState(Bundle)
-	 */
-	@Override
-	protected void onRestoreInstanceState( Bundle savedInstanceState) {
-		super.onRestoreInstanceState( savedInstanceState);
-		if( savedInstanceState != null) {
-			if( total == 0.0f) {
-				updateTotal( savedInstanceState.getFloat( O_SI_TOTAL));
-			}
-		}
-		Log.d( TAG, "onRestoreInstanceState: " + total);
-	}
-	
-	/**
-	 * onSaveInstanceState
-	 * 
-	 * @param outState
-	 *            The bundle of info to save to
-	 * @see android.app.Activity#onSaveInstanceState(Bundle)
-	 */
-	@Override
-	protected void onSaveInstanceState( Bundle outState) {
-		super.onSaveInstanceState( outState);
-		outState.putFloat( O_SI_TOTAL, total);
-		Log.d( TAG, "onSaveInstanceState: " + total);
 	}
 	
 	/**
@@ -120,6 +91,7 @@ public class MainActivity extends Activity implements LoaderCallbacks<Cursor>, O
 	@Override
 	protected final void onPause() {
 		super.onPause();
+		total = 0.0f;
 		Log.d( TAG, "onPause: " + total);
 	}
 	
