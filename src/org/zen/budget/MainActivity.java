@@ -27,7 +27,7 @@ public class MainActivity extends Activity implements LoaderCallbacks<Cursor>, O
 	private float						total;
 	
 	/**
-	 * onCreate
+	 * onCreate, test AIDE on android!
 	 * 
 	 * @param savedInstanceState
 	 *            The {@link Bundle bundle} of joy and info that has been saved
