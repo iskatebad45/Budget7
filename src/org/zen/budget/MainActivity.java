@@ -2,7 +2,6 @@ package org.zen.budget;
 
 import android.app.Activity;
 import android.app.LoaderManager.LoaderCallbacks;
-import android.content.ContentUris;
 import android.content.CursorLoader;
 import android.content.Intent;
 import android.content.Loader;
@@ -22,33 +21,27 @@ import android.widget.TextView;
 
 public class MainActivity extends Activity implements LoaderCallbacks<Cursor>, OnClickListener, OnItemClickListener {
 	
-	private final String				TAG	= ".MainActivity";
-	private static SimpleCursorAdapter	sca;
-	private float						total;
+	private final String TAG = ".MainActivity";
+	private static SimpleCursorAdapter lv_sca;
 	
 	/**
 	 * onCreate
 	 * 
 	 * @param savedInstanceState
-	 *            The {@link Bundle bundle} of joy and info that has been saved
+	 *        The {@link Bundle bundle} of joy and info that has been saved
 	 * @see android.app.Activity#onCreate(Bundle)
 	 */
 	@Override
 	public void onCreate( Bundle savedInstanceState) {
 		super.onCreate( savedInstanceState);
 		setContentView( R.layout.main);
-		Log.d( TAG, "in sca");
-		// final Cursor c =
-		// getContentResolver()
-		// .query( BudgetProvider.CONTENT_URI, BudgetProvider.PROJECTION_ALL, null, null, null);
-		sca =
+		lv_sca =
 				new SimpleCursorAdapter( this, R.layout.item, null, new String[] { BudgetProvider.COL_AMT},
-						new int[] { R.id.tv_amt}, 0);
-		Log.d( TAG, "out sca");
-		ListView lv_list = (ListView)findViewById( android.R.id.list);
-		lv_list.setAdapter( sca);
+					new int[] { R.id.tv_amt}, 0);
+		final ListView lv_list = (ListView)findViewById( android.R.id.list);
+		lv_list.setAdapter( lv_sca);
 		lv_list.setOnItemClickListener( this);
-		sca.setViewBinder( new ViewBinder() {
+		lv_sca.setViewBinder( new ViewBinder() {
 			public boolean setViewValue( View view, Cursor cursor, int columnIndex) {
 				((TextView)view).setText( String.format( "%,+.2f", cursor.getFloat( columnIndex)));
 				((TextView)view).setTypeface( Typeface.createFromAsset( getAssets(), "fonts/segoe.ttf"));
@@ -56,18 +49,6 @@ public class MainActivity extends Activity implements LoaderCallbacks<Cursor>, O
 			}
 		});
 		getLoaderManager().initLoader( 0, null, this);
-		Log.d( TAG, "onCreate: " + total);
-	}
-	
-	/**
-	 * onStart
-	 * 
-	 * @see android.app.Activity#onStart()
-	 */
-	@Override
-	protected final void onStart() {
-		super.onStart();
-		Log.d( TAG, "onStart: " + total);
 	}
 	
 	/**
@@ -77,66 +58,26 @@ public class MainActivity extends Activity implements LoaderCallbacks<Cursor>, O
 	 */
 	protected final void onResume() {
 		super.onResume();
-		final Cursor c = getContentResolver().query( BudgetProvider.TOTAL_URI, null, null, null, null);
-		c.moveToFirst();
-		updateTotal( c.getFloat( 1));
-		Log.d( TAG, "onResume: " + total);
-	}
-	
-	/**
-	 * onPause
-	 * 
-	 * @see android.app.Activity#onPause()
-	 */
-	@Override
-	protected final void onPause() {
-		super.onPause();
-		total = 0.0f;
-		Log.d( TAG, "onPause: " + total);
-	}
-	
-	/**
-	 * onStop
-	 * 
-	 * @see android.app.Activity#onStop()
-	 */
-	@Override
-	protected final void onStop() {
-		super.onStop();
-		Log.d( TAG, "onStop: " + total);
-	}
-	
-	/**
-	 * onDestroy
-	 * 
-	 * @see android.app.Activity#onDestroy()
-	 */
-	@Override
-	protected final void onDestroy() {
-		super.onDestroy();
-		Log.d( TAG, "onDestroy: " + total);
+		updateTotal();
 	}
 	
 	/**
 	 * onClick callback for buttons
 	 * 
 	 * @param v
-	 *            The view that was clicked
+	 *        The view that was clicked
 	 * @see android.view.View.OnClickListener#onClick(View)
 	 */
-	public void onClick( View v) {
-		Log.d( TAG, "onClick");
+	public void onClick( final View v) {
 		final Intent intent = new Intent( this, NewPanelActivity.class);
 		switch( v.getId()) {
 			case R.id.btn_add:
 				intent.putExtra( PanelActivity.INTENT_EXTRA_IS_ADD, true);
 				startActivityForResult( intent, Budget7.REQ_ADD);
-				Log.d( TAG, "onClick: add");
 				break;
 			case R.id.btn_sub:
 				intent.putExtra( PanelActivity.INTENT_EXTRA_IS_ADD, false);
 				startActivityForResult( intent, Budget7.REQ_ADD);
-				Log.d( TAG, "onClick: sub");
 				break;
 			default:
 				Log.d( TAG, "onClick: found something else...");
@@ -148,27 +89,26 @@ public class MainActivity extends Activity implements LoaderCallbacks<Cursor>, O
 	 * onActivityResult
 	 * 
 	 * @param requestCode
-	 *            The request code
+	 *        The request code
 	 * @param resultCode
-	 *            The result code
+	 *        The result code
 	 * @param data
-	 *            The {@link android.content.Intent intent} that returned
+	 *        The {@link android.content.Intent intent} that returned
 	 * @see android.app.Activity#onActivityResult(int,int,Intent)
 	 */
 	@Override
-	protected void onActivityResult( int requestCode, int resultCode, Intent data) {
+	protected void onActivityResult( final int requestCode, final int resultCode, final Intent data) {
 		if( resultCode != RESULT_OK) {
 			Log.d( TAG, "onActivityResult: bad result code");
 		} else {
 			switch( requestCode) {
 				case Budget7.REQ_ADD:
 				case Budget7.REQ_SUB:
-					updateTotal( data.getExtras().getFloat( PanelActivity.INTENT_EXTRA_UPDATE, 0.0f));
-					Log.d( TAG, "onActivityResult: add");
+				case Budget7.REQ_UPDATE:
+					updateTotal();
 					break;
 				default:
-					Log.d( TAG, "onActivityResult: fatal error, found a result req that"
-							+ " wasn't started by this activity");
+					Log.d( TAG, "onActivityResult: fatal error, found a result req that" + " wasn't started by this activity");
 					break;
 			}
 		}
@@ -178,36 +118,35 @@ public class MainActivity extends Activity implements LoaderCallbacks<Cursor>, O
 	 * onItemClick
 	 * 
 	 * @param parent
-	 *            The parent {@link AdapterView ViewGroup}
+	 *        The parent {@link AdapterView ViewGroup}
 	 * @param v
-	 *            The view clicked
+	 *        The view clicked
 	 * @param pos
-	 *            The view's position in the adapter
+	 *        The view's position in the adapter
 	 * @param id
-	 *            The id of the view, relates to the position in a database
+	 *        The id of the view, relates to the position in a database
 	 * @see android.widget.AdapterView.OnItemClickListener#onItemClick(AdapterView, View, int, long)
 	 */
 	public void onItemClick( AdapterView<?> parent, View v, int pos, long id) {
-		final Cursor c =
-				getContentResolver().query( ContentUris.withAppendedId( BudgetProvider.CONTENT_URI, id),
-						BudgetProvider.PROJECTION_ALL, BudgetProvider._ID + "=?", new String[] { "" + id}, null);
-		c.moveToFirst();
+		final Intent intent = new Intent( this, UpdatePanelActivity.class);
+		intent.putExtra( PanelActivity.INTENT_EXTRA_PANEL_ID, id);
+		startActivityForResult( intent, Budget7.REQ_UPDATE);
 	}
 	
 	/**
 	 * Convenience method for updating the total, displaying it, and changing the background color appropriately.
 	 * 
 	 * @param amt
-	 *            The amount to include in the total
+	 *        The amount to include in the total
 	 */
-	private void updateTotal( final float amt) {
-		Log.d( TAG, "updateTotal");
-		total += amt;
-		((TextView)findViewById( R.id.tv_total)).setText( total >= 0.0 ? String.format( "+$%,.2f", total) : String
-				.format( "-$%,.2f", Math.abs( total)));
+	private void updateTotal() {
+		final Cursor c = getContentResolver().query( BudgetProvider.TOTAL_URI, new String[] { "ALL"}, null, null, null);
+		c.moveToFirst();
+		final float total = c.getFloat( 1);
+		((TextView)findViewById( R.id.tv_total)).setText( total >= 0.0 ? String.format( "+$%,.2f", total) : String.format(
+			"-$%,.2f", Math.abs( total)));
 		final int updateColor =
-				total >= 0.0 ? getResources().getColor( R.color.color_green) : getResources().getColor(
-						R.color.color_red);
+				total >= 0.0 ? getResources().getColor( R.color.color_green) : getResources().getColor( R.color.color_red);
 		((RelativeLayout)findViewById( R.id.rl_main)).setBackgroundColor( updateColor);
 		((ListView)findViewById( android.R.id.list)).setCacheColorHint( updateColor);
 	}
@@ -216,40 +155,37 @@ public class MainActivity extends Activity implements LoaderCallbacks<Cursor>, O
 	 * onCreateLoader
 	 * 
 	 * @param id
-	 *            The id of the loader
+	 *        The id of the loader
 	 * @param args
-	 *            A {@link Bundle bundle} of arguments
+	 *        A {@link Bundle bundle} of arguments
 	 * @see android.app.LoaderManager.LoaderCallbacks#onCreateLoader(int, Bundle)
 	 */
-	public Loader<Cursor> onCreateLoader( int id, Bundle args) {
-		Log.d( TAG, "onCreateLoader");
-		return new CursorLoader( this, BudgetProvider.CONTENT_URI, new String[] { BudgetProvider._ID,
-				BudgetProvider.COL_AMT}, null, null, null);
+	public Loader<Cursor> onCreateLoader( final int id, final Bundle args) {
+		return new CursorLoader( this, BudgetProvider.CONTENT_URI, new String[] { BudgetProvider._ID, BudgetProvider.COL_AMT},
+			null, null, null);
 	}
 	
 	/**
 	 * onLoadFinished
 	 * 
 	 * @param l
-	 *            The {@link Loader loader} used
+	 *        The {@link Loader loader} used
 	 * @param c
-	 *            The {@link Cursor cursor} that is finished
+	 *        The {@link Cursor cursor} that is finished
 	 * @see android.app.LoaderManager.LoaderCallbacks#onLoadFinished(Loader, Object)
 	 */
-	public void onLoadFinished( Loader<Cursor> l, Cursor c) {
-		Log.d( TAG, "onLoadFinished");
-		sca.swapCursor( c);
+	public void onLoadFinished( final Loader<Cursor> l, final Cursor c) {
+		lv_sca.swapCursor( c);
 	}
 	
 	/**
 	 * onLoaderReset
 	 * 
 	 * @param l
-	 *            The loader used
+	 *        The loader used
 	 * @see android.app.LoaderManager.LoaderCallbacks#onLoaderReset(Loader)
 	 */
-	public void onLoaderReset( Loader<Cursor> l) {
-		Log.d( TAG, "onLoaderReset");
-		sca.swapCursor( null);
+	public void onLoaderReset( final Loader<Cursor> l) {
+		lv_sca.swapCursor( null);
 	}
 }

@@ -26,7 +26,8 @@
             android:name=".NewPanelActivity"
             android:allowTaskReparenting="false"
             android:excludeFromRecents="true"
-            android:exported="false" android:theme="@style/panel_top_wSlideDown">
+            android:exported="false"
+            android:theme="@style/panel_top_wSlideDown" >
             <intent-filter>
             </intent-filter>
         </activity>
@@ -34,7 +35,8 @@
             android:name=".UpdatePanelActivity"
             android:allowTaskReparenting="false"
             android:excludeFromRecents="true"
-            android:exported="false" >
+            android:exported="false"
+            android:theme="@style/panel_top_wSlideDown" >
             <intent-filter>
             </intent-filter>
         </activity>

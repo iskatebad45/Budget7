@@ -3,8 +3,8 @@ package org.zen.budget;
 import android.app.Application;
 
 public class Budget7 extends Application {
-	protected static final String	PKG	= "org.zen.budget", TAG = ".Budget7";
-	protected static final int		REQ_ADD	= 1, REQ_SUB = 2;
+	protected static final String PKG = "org.zen.budget", TAG = ".Budget7";
+	protected static final int REQ_ADD = 1, REQ_SUB = 2, REQ_UPDATE = 3;
 	
 	@Override
 	public void onCreate() {
