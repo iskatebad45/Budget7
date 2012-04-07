@@ -25,7 +25,7 @@ public class MainActivity extends Activity implements LoaderCallbacks<Cursor>, O
 	private static SimpleCursorAdapter lv_sca;
 	
 	/**
-	 * onCreate
+	 * onCreate, test AIDE on android!
 	 * 
 	 * @param savedInstanceState
 	 *        The {@link Bundle bundle} of joy and info that has been saved
