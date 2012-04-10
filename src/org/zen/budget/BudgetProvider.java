@@ -17,7 +17,7 @@ import android.provider.BaseColumns;
 import android.util.Log;
 
 public class BudgetProvider extends ContentProvider implements BaseColumns {
-	private static final String TAG = ".BudgetProvider";
+	private final String TAG = ".BudgetProvider";
 	private static final String DB_NAME = "budgetitems.db", TABLE_NAME = "items";
 	private static final int DB_VERSION = 1, CODE_TABLE = 1, CODE_ITEM = 2, CODE_TOTAL = 3;
 	private static final UriMatcher matcher;
@@ -55,9 +55,9 @@ public class BudgetProvider extends ContentProvider implements BaseColumns {
 		private static final String CREATE_VIEW = "CREATE VIEW IF NOT EXISTS " + VIEW_NAME + " AS SELECT sum(" + COL_AMT
 				+ ") from items;";
 		
-		private static final String TAG = ".BudgetDbHelper";
+		private final String TAG = ".BudgetDbHelper";
 		
-		private static final String CREATE_TABLE = "CREATE TABLE IF NOT EXISTS " + TABLE_NAME + " (" + _ID
+		private final String CREATE_TABLE = "CREATE TABLE IF NOT EXISTS " + TABLE_NAME + " (" + _ID
 				+ " INTEGER PRIMARY KEY AUTOINCREMENT, " + COL_AMT + " INTEGER NOT NULL, " + COL_LABEL + " TEXT DEFAULT \"\", "
 				+ COL_DATE + " INTEGER NOT NULL);";
 		

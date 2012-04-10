@@ -28,8 +28,6 @@
             android:excludeFromRecents="true"
             android:exported="false"
             android:theme="@style/panel_top_wSlideDown" >
-            <intent-filter>
-            </intent-filter>
         </activity>
         <activity
             android:name=".UpdatePanelActivity"
@@ -37,8 +35,6 @@
             android:excludeFromRecents="true"
             android:exported="false"
             android:theme="@style/panel_top_wSlideDown" >
-            <intent-filter>
-            </intent-filter>
         </activity>
     </application>
 </manifest>

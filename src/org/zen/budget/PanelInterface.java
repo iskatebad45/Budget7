@@ -7,12 +7,12 @@ public interface PanelInterface {
 	 * 
 	 * @return The amount to update the total with (0.0f if no change).
 	 */
-	float checkAction();
+	void checkAction();
 	
 	/**
 	 * This does what should happen when the button with an 'X' (ex) is pressed
 	 * 
 	 * @return The amount to update the total with (0.0f if no change).
 	 */
-	float exAction();
+	void exAction();
 }

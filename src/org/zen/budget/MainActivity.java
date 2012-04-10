@@ -22,7 +22,7 @@ import android.widget.TextView;
 public class MainActivity extends Activity implements LoaderCallbacks<Cursor>, OnClickListener, OnItemClickListener {
 	
 	private final String TAG = ".MainActivity";
-	private static SimpleCursorAdapter lv_sca;
+	private SimpleCursorAdapter lv_sca;
 	
 	/**
 	 * onCreate, test AIDE on android!
@@ -73,44 +73,15 @@ public class MainActivity extends Activity implements LoaderCallbacks<Cursor>, O
 		switch( v.getId()) {
 			case R.id.btn_add:
 				intent.putExtra( PanelActivity.INTENT_EXTRA_IS_ADD, true);
-				startActivityForResult( intent, Budget7.REQ_ADD);
+				startActivity( intent);
 				break;
 			case R.id.btn_sub:
 				intent.putExtra( PanelActivity.INTENT_EXTRA_IS_ADD, false);
-				startActivityForResult( intent, Budget7.REQ_ADD);
+				startActivity( intent);
 				break;
 			default:
 				Log.d( TAG, "onClick: found something else...");
 				break;
-		}
-	}
-	
-	/**
-	 * onActivityResult
-	 * 
-	 * @param requestCode
-	 *        The request code
-	 * @param resultCode
-	 *        The result code
-	 * @param data
-	 *        The {@link android.content.Intent intent} that returned
-	 * @see android.app.Activity#onActivityResult(int,int,Intent)
-	 */
-	@Override
-	protected void onActivityResult( final int requestCode, final int resultCode, final Intent data) {
-		if( resultCode != RESULT_OK) {
-			Log.d( TAG, "onActivityResult: bad result code");
-		} else {
-			switch( requestCode) {
-				case Budget7.REQ_ADD:
-				case Budget7.REQ_SUB:
-				case Budget7.REQ_UPDATE:
-					updateTotal();
-					break;
-				default:
-					Log.d( TAG, "onActivityResult: fatal error, found a result req that" + " wasn't started by this activity");
-					break;
-			}
 		}
 	}
 	
@@ -130,7 +101,7 @@ public class MainActivity extends Activity implements LoaderCallbacks<Cursor>, O
 	public void onItemClick( AdapterView<?> parent, View v, int pos, long id) {
 		final Intent intent = new Intent( this, UpdatePanelActivity.class);
 		intent.putExtra( PanelActivity.INTENT_EXTRA_PANEL_ID, id);
-		startActivityForResult( intent, Budget7.REQ_UPDATE);
+		startActivity( intent);
 	}
 	
 	/**
