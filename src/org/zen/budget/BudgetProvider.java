@@ -17,20 +17,21 @@ import android.provider.BaseColumns;
 import android.util.Log;
 
 public class BudgetProvider extends ContentProvider implements BaseColumns {
-	private final String TAG = ".BudgetProvider";
-	private static final String DB_NAME = "budgetitems.db", TABLE_NAME = "items";
-	private static final int DB_VERSION = 1, CODE_TABLE = 1, CODE_ITEM = 2, CODE_TOTAL = 3;
-	private static final UriMatcher matcher;
-	private static HashMap<String, String> projectionMap;
-	private BudgetDbHelper helper;
+	private final String					TAG				= ".BudgetProvider";
+	private static final String				DB_NAME			= "budgetitems.db", TABLE_NAME = "items";
+	private static final int				DB_VERSION		= 1, CODE_TABLE = 1, CODE_ITEM = 2, CODE_TOTAL = 3;
+	private static final UriMatcher			matcher;
+	private static HashMap<String, String>	projectionMap;
+	private BudgetDbHelper					helper;
 	
-	public static final String AUTHORITY = Budget7.PKG + ".provider", COL_AMT = "amt", COL_LABEL = "label", COL_DATE = "date",
-			VIEW_NAME = "total", CONTENT_TYPE_TABLE = "vnd.android.cursor.dir/vnd.zen.budget7_items",
+	public static final String				AUTHORITY		= Budget7.PKG + ".provider", COL_AMT = "amt",
+			COL_LABEL = "label", COL_DATE = "date", VIEW_NAME = "total",
+			CONTENT_TYPE_TABLE = "vnd.android.cursor.dir/vnd.zen.budget7_items",
 			CONTENT_TYPE_ROW = "vnd.android.cursor.item/vnd.zen.budget7_item",
 			CONTENT_TYPE_TOTAL = "vnd.android.cursor.item/vnd.zen.budget7_total";
-	public static final Uri CONTENT_URI = Uri.parse( "content://" + AUTHORITY + "/" + TABLE_NAME), TOTAL_URI = Uri
-		.parse( "content://" + AUTHORITY + "/" + VIEW_NAME);
-	public static final String[] PROJECTION_ALL = new String[] { _ID, COL_AMT, COL_LABEL, COL_DATE};
+	public static final Uri					CONTENT_URI		= Uri.parse( "content://" + AUTHORITY + "/" + TABLE_NAME),
+			TOTAL_URI = Uri.parse( "content://" + AUTHORITY + "/" + VIEW_NAME);
+	public static final String[]			PROJECTION_ALL	= new String[] { _ID, COL_AMT, COL_LABEL, COL_DATE};
 	
 	static {
 		matcher = new UriMatcher( UriMatcher.NO_MATCH);
@@ -52,20 +53,21 @@ public class BudgetProvider extends ContentProvider implements BaseColumns {
 	 */
 	private static class BudgetDbHelper extends SQLiteOpenHelper {
 		
-		private static final String CREATE_VIEW = "CREATE VIEW IF NOT EXISTS " + VIEW_NAME + " AS SELECT sum(" + COL_AMT
-				+ ") from items;";
+		private static final String	CREATE_VIEW		= "CREATE VIEW IF NOT EXISTS " + VIEW_NAME + " AS SELECT sum("
+															+ COL_AMT + ") from items;";
 		
-		private final String TAG = ".BudgetDbHelper";
+		private final String		TAG				= ".BudgetDbHelper";
 		
-		private final String CREATE_TABLE = "CREATE TABLE IF NOT EXISTS " + TABLE_NAME + " (" + _ID
-				+ " INTEGER PRIMARY KEY AUTOINCREMENT, " + COL_AMT + " INTEGER NOT NULL, " + COL_LABEL + " TEXT DEFAULT \"\", "
-				+ COL_DATE + " INTEGER NOT NULL);";
+		private final String		CREATE_TABLE	= "CREATE TABLE IF NOT EXISTS " + TABLE_NAME + " (" + _ID
+															+ " INTEGER PRIMARY KEY AUTOINCREMENT, " + COL_AMT
+															+ " INTEGER NOT NULL, " + COL_LABEL
+															+ " TEXT DEFAULT \"\", " + COL_DATE + " INTEGER NOT NULL);";
 		
 		/**
 		 * Uses static database name ({@value #DB_NAME}) and version ({@value #DB_VERSION})
 		 * 
 		 * @param context
-		 *        The context of the database helper
+		 *            The context of the database helper
 		 * @see android.database.sqlite.SQLiteDatabase#SQLiteDatabase(Context, String, CursorFactory, int)
 		 */
 		public BudgetDbHelper( final Context context) {
@@ -77,7 +79,7 @@ public class BudgetProvider extends ContentProvider implements BaseColumns {
 		 * onCreate
 		 * 
 		 * @param db
-		 *        The database to use
+		 *            The database to use
 		 * @see android.database.sqlite.SQLiteDatabase#onCreate(SQLiteDatabase)
 		 */
 		@Override
@@ -166,17 +168,21 @@ public class BudgetProvider extends ContentProvider implements BaseColumns {
 		switch( matcher.match( uri)) {
 			case CODE_ITEM:
 				Log.d( TAG, "query: item");
-				c = qb.query( helper.getReadableDatabase(), projection, selection, selectionArgs, null, null, sortOrder);
+				c =
+						qb.query( helper.getReadableDatabase(), projection, selection, selectionArgs, null, null,
+								sortOrder);
 				break;
 			case CODE_TABLE:
 				Log.d( TAG, "query: table");
-				c = qb.query( helper.getReadableDatabase(), projection, _ID + " NOT NULL", selectionArgs, null, null, sortOrder);
+				c =
+						qb.query( helper.getReadableDatabase(), projection, _ID + " NOT NULL", selectionArgs, null,
+								null, sortOrder);
 				break;
 			case CODE_TOTAL:
 				Log.d( TAG, "query: total");
 				c =
-						helper.getReadableDatabase().query( VIEW_NAME, new String[] { "rowid as _id", "*"}, null, null, null,
-							null, null);
+						helper.getReadableDatabase().query( VIEW_NAME, new String[] { "rowid as _id", "*"}, null, null,
+								null, null, null);
 				break;
 			default:
 				throw new IllegalArgumentException( "Unknown URI " + uri);

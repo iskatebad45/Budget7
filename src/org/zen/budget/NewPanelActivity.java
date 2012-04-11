@@ -11,13 +11,12 @@ import android.widget.Toast;
  * 
  * @see PanelActivity
  * @author zen
- * 
  */
 
 public final class NewPanelActivity extends PanelActivity {
 	@SuppressWarnings( "unused")
-	private final String TAG = ".NewPanelActivity";
-	protected boolean isPositive;
+	private final String	TAG	= ".NewPanelActivity";
+	protected boolean		isPositive;
 	
 	@Override
 	public void onCreate( final Bundle savedInstanceState) {
@@ -68,5 +67,6 @@ public final class NewPanelActivity extends PanelActivity {
 	 * @see org.zen.budget.PanelActivity#exAction()
 	 */
 	public final void exAction() {
+		// ignore. nothing is done because this is essentially a cancel
 	}
 }

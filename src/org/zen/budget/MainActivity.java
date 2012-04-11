@@ -7,6 +7,7 @@ import android.content.Intent;
 import android.content.Loader;
 import android.database.Cursor;
 import android.graphics.Typeface;
+import android.os.AsyncTask;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
@@ -21,14 +22,14 @@ import android.widget.TextView;
 
 public class MainActivity extends Activity implements LoaderCallbacks<Cursor>, OnClickListener, OnItemClickListener {
 	
-	private final String TAG = ".MainActivity";
-	private SimpleCursorAdapter lv_sca;
+	private final String		TAG	= ".MainActivity";
+	private SimpleCursorAdapter	lv_sca;
 	
 	/**
 	 * onCreate, test AIDE on android!
 	 * 
 	 * @param savedInstanceState
-	 *        The {@link Bundle bundle} of joy and info that has been saved
+	 *            The {@link Bundle bundle} of joy and info that has been saved
 	 * @see android.app.Activity#onCreate(Bundle)
 	 */
 	@Override
@@ -37,7 +38,7 @@ public class MainActivity extends Activity implements LoaderCallbacks<Cursor>, O
 		setContentView( R.layout.main);
 		lv_sca =
 				new SimpleCursorAdapter( this, R.layout.item, null, new String[] { BudgetProvider.COL_AMT},
-					new int[] { R.id.tv_amt}, 0);
+						new int[] { R.id.tv_amt}, 0);
 		final ListView lv_list = (ListView)findViewById( android.R.id.list);
 		lv_list.setAdapter( lv_sca);
 		lv_list.setOnItemClickListener( this);
@@ -65,7 +66,7 @@ public class MainActivity extends Activity implements LoaderCallbacks<Cursor>, O
 	 * onClick callback for buttons
 	 * 
 	 * @param v
-	 *        The view that was clicked
+	 *            The view that was clicked
 	 * @see android.view.View.OnClickListener#onClick(View)
 	 */
 	public void onClick( final View v) {
@@ -89,13 +90,13 @@ public class MainActivity extends Activity implements LoaderCallbacks<Cursor>, O
 	 * onItemClick
 	 * 
 	 * @param parent
-	 *        The parent {@link AdapterView ViewGroup}
+	 *            The parent {@link AdapterView ViewGroup}
 	 * @param v
-	 *        The view clicked
+	 *            The view clicked
 	 * @param pos
-	 *        The view's position in the adapter
+	 *            The view's position in the adapter
 	 * @param id
-	 *        The id of the view, relates to the position in a database
+	 *            The id of the view, relates to the position in a database
 	 * @see android.widget.AdapterView.OnItemClickListener#onItemClick(AdapterView, View, int, long)
 	 */
 	public void onItemClick( AdapterView<?> parent, View v, int pos, long id) {
@@ -108,41 +109,56 @@ public class MainActivity extends Activity implements LoaderCallbacks<Cursor>, O
 	 * Convenience method for updating the total, displaying it, and changing the background color appropriately.
 	 * 
 	 * @param amt
-	 *        The amount to include in the total
+	 *            The amount to include in the total
 	 */
 	private void updateTotal() {
-		final Cursor c = getContentResolver().query( BudgetProvider.TOTAL_URI, new String[] { "ALL"}, null, null, null);
-		c.moveToFirst();
-		final float total = c.getFloat( 1);
-		((TextView)findViewById( R.id.tv_total)).setText( total >= 0.0 ? String.format( "+$%,.2f", total) : String.format(
-			"-$%,.2f", Math.abs( total)));
-		final int updateColor =
-				total >= 0.0 ? getResources().getColor( R.color.color_green) : getResources().getColor( R.color.color_red);
-		((RelativeLayout)findViewById( R.id.rl_main)).setBackgroundColor( updateColor);
-		((ListView)findViewById( android.R.id.list)).setCacheColorHint( updateColor);
+		new UpdateTotalWorker().execute();
+	}
+	
+	public class UpdateTotalWorker extends AsyncTask<Void, Void, Cursor> {
+		@Override
+		protected Cursor doInBackground( Void... params) {
+			final Cursor c =
+					getContentResolver().query( BudgetProvider.TOTAL_URI, new String[] { "ALL"}, null, null, null);
+			return c;
+		}
+		
+		@Override
+		protected void onPostExecute( Cursor c) {
+			c.moveToFirst();
+			final float total = c.getFloat( 1);
+			((TextView)findViewById( R.id.tv_total)).setText( total >= 0.0 ? String.format( "+$%,.2f", total) : String
+					.format( "-$%,.2f", Math.abs( total)));
+			final int updateColor =
+					total >= 0.0 ? getResources().getColor( R.color.color_green) : getResources().getColor(
+							R.color.color_red);
+			((RelativeLayout)findViewById( R.id.rl_main)).setBackgroundColor( updateColor);
+			((ListView)findViewById( android.R.id.list)).setCacheColorHint( updateColor);
+		}
+		
 	}
 	
 	/**
 	 * onCreateLoader
 	 * 
 	 * @param id
-	 *        The id of the loader
+	 *            The id of the loader
 	 * @param args
-	 *        A {@link Bundle bundle} of arguments
+	 *            A {@link Bundle bundle} of arguments
 	 * @see android.app.LoaderManager.LoaderCallbacks#onCreateLoader(int, Bundle)
 	 */
 	public Loader<Cursor> onCreateLoader( final int id, final Bundle args) {
-		return new CursorLoader( this, BudgetProvider.CONTENT_URI, new String[] { BudgetProvider._ID, BudgetProvider.COL_AMT},
-			null, null, null);
+		return new CursorLoader( this, BudgetProvider.CONTENT_URI, new String[] { BudgetProvider._ID,
+				BudgetProvider.COL_AMT}, null, null, null);
 	}
 	
 	/**
 	 * onLoadFinished
 	 * 
 	 * @param l
-	 *        The {@link Loader loader} used
+	 *            The {@link Loader loader} used
 	 * @param c
-	 *        The {@link Cursor cursor} that is finished
+	 *            The {@link Cursor cursor} that is finished
 	 * @see android.app.LoaderManager.LoaderCallbacks#onLoadFinished(Loader, Object)
 	 */
 	public void onLoadFinished( final Loader<Cursor> l, final Cursor c) {
@@ -153,7 +169,7 @@ public class MainActivity extends Activity implements LoaderCallbacks<Cursor>, O
 	 * onLoaderReset
 	 * 
 	 * @param l
-	 *        The loader used
+	 *            The loader used
 	 * @see android.app.LoaderManager.LoaderCallbacks#onLoaderReset(Loader)
 	 */
 	public void onLoaderReset( final Loader<Cursor> l) {
